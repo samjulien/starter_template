@@ -1,0 +1,21 @@
+[project]
+name = "modal-app"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Sam Julien", email = "sam.julien@writer.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.6",
+    "modal>=0.72.15",
+    "python-dotenv>=1.0.1",
+]
+
+[project.scripts]
+modal-app = "modal_app:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
