@@ -75,12 +75,31 @@ def read_root():
 
 @fastapi_app.post("/transcribe")
 async def transcribe_audio(file: UploadFile = File(...)):
-    client = OpenAI()
-    transcription = client.audio.transcriptions.create(
-        model="whisper-1",
-        file=file
-    )
-    return {"transcript": transcription.text}
+    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    if not file.content_type.startswith('audio/'):
+            raise HTTPException(
+                status_code=400,
+                detail="File must be an audio file. Received: " + file.content_type
+            )
+    try:
+        audio_bytes = await file.read()
+        audio_file = BytesIO(audio_bytes)
+        audio_file.name = file.filename or "audio.webm"
+
+        # Print some debug info
+        print(f"Processing audio file: {file.filename}")
+        print(f"Content type: {file.content_type}")
+        print(f"File size: {len(audio_bytes)} bytes")
+
+        transcription = client.audio.transcriptions.create(
+            model="whisper-1",
+            file=audio_file
+        )
+        return {"transcript": transcription.text}
+    except Exception as e:
+        print("there was an error")
+        print(str(e))
+        return {"error": str(e)}, 500
 
 @fastapi_app.post("/generate_image")
 async def generate_image(request: ImageGenerationRequest):
